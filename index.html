@@ -1,0 +1,75 @@
+<script src="../simpleTest.js"></script>
+<script>
+
+function isPrototypeOf(prototype, objectWhosePrototypeChainWillBeSearched){
+
+  if (prototype === null || undefined ){
+     throw new TypeError("prototype cannot be null or undefined.");
+  }
+  
+  var  objectWhosePrototypeChainWillBeSearchedPrototype = Object.getPrototypeOf(objectWhosePrototypeChainWillBeSearched);
+
+    // while objectWhosePrototypeChainWillBeSearchedPrototype exists
+  	while (objectWhosePrototypeChainWillBeSearchedPrototype !== null) {
+  		if (objectWhosePrototypeChainWillBeSearchedPrototype === prototype) {
+  			return true;
+  		}
+  		// update var  objectWhosePrototypeChainWillBeSearchedPrototype, go further down the chain
+  		objectWhosePrototypeChainWillBeSearchedPrototype = Object.getPrototypeOf(objectWhosePrototypeChainWillBeSearchedPrototype);
+  	} 
+  	return false;
+
+}
+
+var canine = {
+  bark: function() {
+    console.log('bark');
+  }
+};
+
+var dog = Object.create(canine);
+dog.fetch = function() {
+  console.log('fetch');
+};
+
+var myDog = Object.create(dog);
+var empty = Object.create(null);
+
+
+tests({
+
+'It should check whether or not myDog exists within dog.': function() {
+  var result = isPrototypeOf(dog, myDog); 
+	eq(result, true);
+},
+
+'It should check whether or not an empty object exists within dog.': function() {
+  var result = isPrototypeOf(dog, empty); 
+  eq(result, false);
+},
+
+'It should check whether or not myDog exists within object.prototype chain.': function() {
+  var result = isPrototypeOf(Object.prototype, myDog); 
+  eq(result, true);
+},
+
+'It should check whether or not myDog exists within canines prototype chain.': function() {
+  var result = isPrototypeOf(canine, myDog); // true
+  eq(result, true);
+},
+
+'It should throw a TypeError if prototype = null or undefined.': function (){
+
+  try {
+   isPrototypeOf(null,undefined);
+}
+catch(error) {
+ var newError = error;
+}
+  eq(( newError instanceof TypeError), true);
+}
+
+});
+
+
+</script>
